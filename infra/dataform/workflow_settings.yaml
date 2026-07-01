@@ -1,0 +1,5 @@
+defaultProject: my-project
+defaultLocation: US
+defaultDataset: bronze
+defaultAssertionDataset: dataform_assertions
+dataformCoreVersion: "3.0.0"

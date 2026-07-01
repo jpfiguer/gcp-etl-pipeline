@@ -1,0 +1,31 @@
+-- bronze: limpieza y tipos
+-- expone las filas raw parseadas y con tipos derivados del payload_json
+config {
+  type: "incremental",
+  schema: "bronze",
+  name: "events",
+  description: "eventos cdc limpios con payload parseado",
+  bigquery: {
+    partitionBy: "DATE(event_timestamp)",
+    clusterBy: ["source_table", "business_key"]
+  },
+  assertions: {
+    uniqueKey: ["event_id"],
+    nonNull: ["event_id", "event_timestamp", "source_table", "business_key", "operation"]
+  }
+}
+
+select
+  event_id,
+  event_timestamp,
+  ingested_at,
+  source_table,
+  business_key,
+  operation,
+  safe.parse_json(payload_json) as payload,
+  safe.parse_json(payload_before_json) as payload_before,
+  schema_version,
+  partition_date,
+  current_timestamp() as bronze_loaded_at
+from ${ref("raw", "events")}
+${when(incremental(), `where event_timestamp > (select coalesce(max(event_timestamp), timestamp("1970-01-01")) from ${self()})`)}

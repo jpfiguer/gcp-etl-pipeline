@@ -1,0 +1,39 @@
+# stack local para dev sin dependencias de gcp real
+# usa emuladores oficiales de pub/sub y bigquery
+services:
+  pubsub-emulator:
+    image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+    command: >
+      gcloud beta emulators pubsub start
+      --host-port=0.0.0.0:8085
+      --project=my-project
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # nota: bigquery no tiene emulator oficial, usar bigquery-emulator de goccy
+  bigquery-emulator:
+    image: ghcr.io/goccy/bigquery-emulator:latest
+    command: >
+      --project=my-project
+      --port=9050
+    ports:
+      - "9050:9050"
+
+  pipeline:
+    build: .
+    depends_on:
+      pubsub-emulator:
+        condition: service_healthy
+    environment:
+      PUBSUB_EMULATOR_HOST: pubsub-emulator:8085
+      BIGQUERY_EMULATOR_HOST: bigquery-emulator:9050
+      GCP_PROJECT: my-project
+      LOG_FORMAT: console
+      LOG_LEVEL: INFO
+    volumes:
+      - ./src:/app/src

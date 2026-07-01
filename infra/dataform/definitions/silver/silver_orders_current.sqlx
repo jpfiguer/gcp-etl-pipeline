@@ -1,0 +1,39 @@
+-- silver: reglas de negocio aplicadas
+-- vista current state por business_key resolviendo last-write-wins
+-- deletes hard descartan la fila, operaciones insert/update dejan el ultimo estado
+config {
+  type: "table",
+  schema: "silver",
+  name: "orders_current",
+  description: "estado actual de cada order aplicando LWW y deletes",
+  bigquery: {
+    partitionBy: "DATE(effective_at)",
+    clusterBy: ["business_key"]
+  },
+  assertions: {
+    uniqueKey: ["business_key"],
+    nonNull: ["business_key", "effective_at"]
+  }
+}
+
+with ranked as (
+  select
+    business_key,
+    operation,
+    event_timestamp as effective_at,
+    payload,
+    row_number() over (
+      partition by business_key
+      order by event_timestamp desc, event_id desc
+    ) as rn
+  from ${ref("bronze", "events")}
+  where source_table = "orders"
+)
+select
+  business_key,
+  operation,
+  effective_at,
+  payload,
+  current_timestamp() as silver_loaded_at
+from ranked
+where rn = 1 and operation != "delete"

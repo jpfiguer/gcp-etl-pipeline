@@ -1,0 +1,9 @@
+-- declara la tabla raw.events como una fuente para el resto de las capas
+-- dataform no la crea, solo la referencia por nombre
+config {
+  type: "declaration",
+  database: "my-project",
+  schema: "raw",
+  name: "events",
+  description: "cdc events producidos por el pipeline apache beam"
+}

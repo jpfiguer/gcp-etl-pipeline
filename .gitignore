@@ -1,0 +1,27 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.log
+.venv/
+venv/
+node_modules/
+.DS_Store
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+# secretos y credenciales
+*.pem
+*.key
+*.pfx
+credentials*.json
+service-account*.json

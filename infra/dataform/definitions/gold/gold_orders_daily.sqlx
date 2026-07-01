@@ -1,0 +1,26 @@
+-- gold: data mart de orders agregados por dia
+-- lo consumen dashboards y jobs analiticos
+config {
+  type: "table",
+  schema: "gold",
+  name: "orders_daily",
+  description: "agregado diario de orders, listo para consumo analitico",
+  bigquery: {
+    partitionBy: "DATE(order_date)",
+    clusterBy: ["region"]
+  },
+  assertions: {
+    uniqueKey: ["order_date", "region"],
+    nonNull: ["order_date", "region", "order_count", "total_amount"]
+  }
+}
+
+select
+  date(effective_at) as order_date,
+  json_value(payload, "$.region") as region,
+  count(*) as order_count,
+  sum(cast(json_value(payload, "$.amount") as numeric)) as total_amount,
+  avg(cast(json_value(payload, "$.amount") as numeric)) as avg_amount,
+  current_timestamp() as gold_loaded_at
+from ${ref("silver", "orders_current")}
+group by order_date, region
