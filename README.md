@@ -107,7 +107,7 @@ flowchart TB
 ```
 gcp-etl-pipeline/
 ├── README.md
-├── LICENSE                            AGPL-3.0
+├── LICENSE                            MIT
 ├── pyproject.toml
 ├── .env.example
 ├── .gitignore
@@ -190,5 +190,5 @@ El pipeline:
 
 ## Licencia
 
-AGPL-3.0. Si integras esto en un producto cerrado, hay que licenciar el producto
-tambien bajo AGPL. Es un portfolio, no un componente reusable.
+MIT. Es codigo de referencia: esta pensado para leerse y adaptarse, no para
+instalarse como dependencia. Usalo en lo que quieras.

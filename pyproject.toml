@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "reference etl pipeline from PostgreSQL to BigQuery on GCP"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "AGPL-3.0" }
+license = { text = "MIT" }
 authors = [{ name = "Juan Pablo Figueroa", email = "jpablofigueroar@gmail.com" }]
 
 dependencies = [
